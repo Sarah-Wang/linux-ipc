@@ -129,32 +129,32 @@ void *spooler(void *arg)
 	int r;
 
 	while (1) {  // forever
-	// Lock mutex
-	r = pthread_mutex_lock(&buf_mutex);
-	if (r) {
-		fprintf(stderr, "Error = %d (%s)\n", r, strerror(r));
-		exit (1);
-	}
-	while (!lines_to_print)
-		pthread_cond_wait(&spool_cond, &buf_mutex);
+		// Lock mutex
+		r = pthread_mutex_lock(&buf_mutex);
+		if (r) {
+			fprintf(stderr, "Error = %d (%s)\n", r, strerror(r));
+			exit (1);
+		}
+		while (!lines_to_print)
+			pthread_cond_wait(&spool_cond, &buf_mutex);
 
-	printf("%s", buf[buffer_print_index]);
-	lines_to_print--;
+		printf("%s", buf[buffer_print_index]);
+		lines_to_print--;
 
-	buffer_print_index++;
-	if (buffer_print_index == MAX_BUFFERS)
-		buffer_print_index = 0;
+		buffer_print_index++;
+		if (buffer_print_index == MAX_BUFFERS)
+			buffer_print_index = 0;
 
-	buffers_available++;
+		buffers_available++;
 
-	pthread_cond_signal(&buf_cond);
+		pthread_cond_signal(&buf_cond);
 
-	// Unlock mutex
-	r = pthread_mutex_unlock(&buf_mutex);
-	if (r) {
-		fprintf(stderr, "Error = %d (%s)\n", r, strerror(r));
-		exit(1);
-	}
+		// Unlock mutex
+		r = pthread_mutex_unlock(&buf_mutex);
+		if (r) {
+			fprintf(stderr, "Error = %d (%s)\n", r, strerror(r));
+			exit(1);
+		}
 
 	}
 }
